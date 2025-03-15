@@ -1,0 +1,66 @@
+import java.io.File;
+import java.io.FileWriter;
+import java.io.FileReader;
+import java.io.BufferedReader;
+import java.io.IOException;
+
+public class FileOperationsDemo {
+    public static void main(String[] args) {
+        String fileName = "example.txt"; // File name
+
+        // 1. Create and Write to a File
+        createAndWriteFile(fileName, "Hello, this is a sample text file.\nJava file operations demonstration.");
+
+        // 2. Read from the File
+        readFile(fileName);
+
+        // 3. Delete the File
+        deleteFile(fileName);
+    }
+
+    /**
+     * Creates a file and writes text to it.
+     *
+     * @param fileName The name of the file to create.
+     * @param content The content to write into the file.
+     */
+    public static void createAndWriteFile(String fileName, String content) {
+        try (FileWriter writer = new FileWriter(fileName)) {
+            writer.write(content);
+            System.out.println("File created and content written successfully.");
+        } catch (IOException e) {
+            System.out.println("Error writing to file: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Reads the content of a file and prints it to the console.
+     *
+     * @param fileName The name of the file to read.
+     */
+    public static void readFile(String fileName) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            System.out.println("File Content:");
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading file: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Deletes a file.
+     *
+     * @param fileName The name of the file to delete.
+     */
+    public static void deleteFile(String fileName) {
+        File file = new File(fileName);
+        if (file.delete()) {
+            System.out.println("File deleted successfully.");
+        } else {
+            System.out.println("Failed to delete the file.");
+        }
+    }
+}
