@@ -1,0 +1,79 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import org.json.JSONObject; // Requires org.json library (can be added via Maven or manually)
+
+public class WeatherApp {
+    private static final String API_KEY = "YOUR_API_KEY"; // Replace with your API key
+    private static final String BASE_URL = "https://api.openweathermap.org/data/2.5/weather?q=";
+
+    public static void main(String[] args) {
+        String city = "New York"; // Change city as needed
+        fetchWeatherData(city);
+    }
+
+    /**
+     * Fetches weather data for a given city.
+     *
+     * @param city The city name.
+     */
+    public static void fetchWeatherData(String city) {
+        try {
+            String urlString = BASE_URL + city + "&appid=" + API_KEY + "&units=metric";
+            URL url = new URL(urlString);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Accept", "application/json");
+
+            if (conn.getResponseCode() != 200) {
+                System.out.println("Error: Unable to fetch weather data.");
+                return;
+            }
+
+            // Read response
+            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            StringBuilder response = new StringBuilder();
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                response.append(line);
+            }
+            reader.close();
+            conn.disconnect();
+
+            // Parse JSON response
+            parseWeatherData(response.toString());
+
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Parses and displays weather data in a structured format.
+     *
+     * @param jsonResponse The JSON response from the API.
+     */
+    public static void parseWeatherData(String jsonResponse) {
+        JSONObject json = new JSONObject(jsonResponse);
+        String cityName = json.getString("name");
+        JSONObject main = json.getJSONObject("main");
+        double temperature = main.getDouble("temp");
+        double feelsLike = main.getDouble("feels_like");
+        int humidity = main.getInt("humidity");
+
+        JSONObject weather = json.getJSONArray("weather").getJSONObject(0);
+        String weatherDescription = weather.getString("description");
+
+        // Display structured output
+        System.out.println("========== Weather Report ==========");
+        System.out.println("City: " + cityName);
+        System.out.println("Temperature: " + temperature + "°C");
+        System.out.println("Feels Like: " + feelsLike + "°C");
+        System.out.println("Humidity: " + humidity + "%");
+        System.out.println("Condition: " + weatherDescription);
+        System.out.println("====================================");
+    }
+}
